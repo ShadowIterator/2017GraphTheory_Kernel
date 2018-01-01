@@ -146,6 +146,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="siglobal.h" />
+    <ClInclude Include="sigraph.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dijkstratest.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="sigraph.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
