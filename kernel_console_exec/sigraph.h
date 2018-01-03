@@ -54,9 +54,13 @@ namespace SI
 		SIGraph(int tn = 0) :n(tn), m(0), Elast(NULL), V(NULL)
 		{
 			if (!n) return;
-			Elast = new edge*[n];
+			_allocBuffer();
+		}
+		void _allocBuffer()
+		{
+			if(Elast==NULL) Elast = new edge*[n];
 			std::memset(Elast, 0, n * sizeof(edge*));
-			V = new VertexInfo* [n];
+			if (V == NULL) V = new VertexInfo*[n];
 			std::memset(V, 0, n * sizeof(vertex*));
 		}
 		void delList(edge* edgeListNode)
@@ -71,7 +75,20 @@ namespace SI
 			{
 				delList(Elast[i]);
 				Elast[i] = NULL;
+				delete V[i];
+				V[i] = NULL;
 			}
+		}
+		void destroy()
+		{
+			for (int i = 0; i < n; ++i)
+				delList(Elast[i]);
+			delete[] Elast;
+			for (int i = 0; i < n; ++i)
+				delete V[i];
+			delete[] V;
+			Elast = V = NULL;
+			n = m = 0;
 		}
 		void appendSize(int nn)
 		{
@@ -135,6 +152,81 @@ namespace SI
 					if (u^pu)
 						pgraph->addPath(prev[u]->start, u, *(prev[u]->pdata));
 			}
+		}
+
+		int dijkstraStep(int stp, int u, int* dist, edge* selEdge = NULL)
+		{
+			static priority_queue<pii, vector<pii>, Greater<pii> > q;
+			static edge** prev = NULL;//new edge*[n];
+			int v, w, rtn;
+			static int pu;
+			if (stp == 0)
+			{
+				if (prev != NULL)
+				{
+					for (int i = 0; i < n; ++i)
+						delList(prev[i]);
+					delete[] prev;
+				}
+				prev = new edge*[n];
+				while (!q.empty()) q.pop();
+				for (int i = 0; i < n; ++i) dist[i] = INF;
+				dist[pu = u] = 0;
+				q.push(std::make_pair(0, u));
+			}
+
+			while (dist[q.top().second] != q.top().first)
+				q.pop();
+			u = q.top().second;
+			if (selEdge != NULL && (pu^u)) selEdge = prev[u];
+			rtn = dist[u];
+			q.pop();
+			for (edge* p = Elast[u]; p != NULL; p = p->next)
+				if (dist[v = p->end] >(w = (dist[u] + p->pdata->length())))
+				{
+					q.push(std::make_pair((dist[v] = w), v));
+					prev[v] = p;
+				}
+			return rtn;
+		}
+
+		int prim(int u, SIGraph* pgraph = NULL)
+		{
+			static priority_queue<pii, vector<pii>, Greater<pii> > q;
+			int v, w;
+			int pu = u;
+			int rtn = 0;
+			int* dist = new int[n];
+			edge** prev = new edge*[n];
+			while (!q.empty()) q.pop();
+			for (int i = 0; i < n; ++i) dist[i] = INF;
+			dist[u] = 0;
+			q.push(std::make_pair(0, u));
+			for (int i = 1; i < n; ++i)
+			{
+				while (dist[q.top().second] != q.top().first)
+					q.pop();
+				u = q.top().second;
+				rtn += q.top().first;
+				q.pop();
+				for (edge* p = Elast[u]; p != NULL; p = p->next)
+					if (dist[v = p->end] > (w = p->pdata->length()))
+					{
+						q.push(std::make_pair((dist[v] = w), v));
+						prev[v] = p;
+					}
+			}
+			while (dist[q.top().second] != q.top().first)
+				q.pop();
+			rtn += q.top().first;
+			if (pgraph != NULL)
+			{
+				pgraph->clear();
+				for (u = 0; u < n; ++u)
+					if (u^pu)
+						pgraph->addPath(prev[u]->start, u, *(prev[u]->pdata));
+			}
+			return rtn;
 		}
 	};
 	
