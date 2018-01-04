@@ -10,20 +10,29 @@ namespace SI
 	using std::pair;
 	using std::vector;
 	template<class EdgeInfo>
-	class Edge
+	class EdgeNode
 	{
 	public:
 		EdgeInfo* pdata;
-		Edge* next;
-		int start;
-		int end;
-		Edge() :pdata(NULL), next(NULL), end(0)
+		EdgeNode* next;
+
+		EdgeNode() :pdata(NULL), next(NULL), end(0)
 		{
 
 		}
-		Edge(Edge* tnext, int tstart, int tend, const EdgeInfo& tdata) :next(tnext), start(tstart), end(tend)
+		EdgeNode(EdgeNode* tnext, const EdgeInfo& tdata) :next(tnext)
 		{
 			pdata = new EdgeInfo(tdata);
+		}
+
+		int start()
+		{
+			return pdata->start();
+		}
+
+		int end()
+		{
+			return pdata->end();
 		}
 	};
 
@@ -40,7 +49,7 @@ namespace SI
 	template<class EdgeInfo,class VertexInfo>
 	class SIGraph
 	{
-		typedef Edge<EdgeInfo> edge;
+		typedef EdgeNode<EdgeInfo> edge;
 		typedef VertexInfo vertex;
 		typedef pair<int, int> pii;
 	//private:
@@ -48,8 +57,8 @@ namespace SI
 		static const int INF = 1 << 29;
 
 		int n, m;
-		Edge<EdgeInfo>** Elast;
-		VertexInfo** V;
+		EdgeNode<EdgeInfo>** Elast;
+		VertexInfo* V;
 	public:
 		SIGraph(int tn = 0) :n(tn), m(0), Elast(NULL), V(NULL)
 		{
@@ -60,8 +69,11 @@ namespace SI
 		{
 			if(Elast==NULL) Elast = new edge*[n];
 			std::memset(Elast, 0, n * sizeof(edge*));
-			if (V == NULL) V = new VertexInfo*[n];
-			std::memset(V, 0, n * sizeof(vertex*));
+			if (V == NULL) V = new VertexInfo[n];
+		}
+		void setVertexInfo(int u, const VertexInfo& tvi)
+		{
+			V[u] = tvi;
 		}
 		void delList(edge* edgeListNode)
 		{
@@ -75,9 +87,8 @@ namespace SI
 			{
 				delList(Elast[i]);
 				Elast[i] = NULL;
-				delete V[i];
-				V[i] = NULL;
 			}
+			delete[] V;
 		}
 		void destroy()
 		{
@@ -104,17 +115,17 @@ namespace SI
 			V = nV;
 			n = nn;
 		}
-		void addPath(int u, int v, const EdgeInfo& w)
+		void addPath(const EdgeInfo& ei)
 		{
-			edge* ne = new edge(Elast[u], u, v, w);
-			Elast[u] = ne;
+			edge* ne = new edge(Elast[ei.start()], ei);
+			Elast[ei.start()] = ne;
 		}
 		void delPath(int u, int v)
 		{
 	//		if (n == 0)return;
 			edge* pp = NULL;
 			edge* np = NULL;
-			for (np = Elast[u]; np && np->end != v; np = np->next) pp = np;
+			for (np = Elast[u]; np && np->end() != v; np = np->next) pp = np;
 			if (np == NULL) return;
 			if (pp == NULL) Elast[u] = np->next;
 			else pp->next = np->next;
@@ -138,7 +149,7 @@ namespace SI
 				u = q.top().second;
 				q.pop();
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
-					if (dist[v = p->end] > (w = (dist[u] + p->pdata->length())))
+					if (dist[v = p->end()] > (w = (dist[u] + p->pdata->length())))
 					{
 						q.push(std::make_pair((dist[v] = w), v));
 						prev[v] = p;
@@ -149,11 +160,11 @@ namespace SI
 				pgraph->clear();
 				for (u = 0; u < n; ++u)
 					if (u^pu)
-						pgraph->addPath(prev[u]->start, u, *(prev[u]->pdata));
+						pgraph->addPath(*(prev[u]->pdata));//(prev[u]->start, u, *(prev[u]->pdata));
 			}
 		}
 
-		int dijkstraStep(int stp, int u, int* dist, edge* selEdge = NULL)
+		int dijkstraStep(int stp, int u, int* dist, EdgeInfo* selEdge = NULL)
 		{
 			static priority_queue<pii, vector<pii>, Greater<pii> > q;
 			static edge** prev = NULL;//new edge*[n];
@@ -177,11 +188,11 @@ namespace SI
 			while (dist[q.top().second] != q.top().first)
 				q.pop();
 			u = q.top().second;
-			if (selEdge != NULL && (pu^u)) *selEdge = *prev[u];
+			if (selEdge != NULL && (pu^u)) *selEdge = *(prev[u]->pdata);
 			rtn = dist[u];
 			q.pop();
 			for (edge* p = Elast[u]; p != NULL; p = p->next)
-				if (dist[v = p->end] >(w = (dist[u] + p->pdata->length())))
+				if (dist[v = p->end()] >(w = (dist[u] + p->pdata->length())))
 				{
 					q.push(std::make_pair((dist[v] = w), v));
 					prev[v] = p;
@@ -209,7 +220,7 @@ namespace SI
 				rtn += q.top().first;
 				q.pop();
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
-					if (!used[v = p->end] && dist[v] > (w = p->pdata->length()))
+					if (!used[v = p->end()] && dist[v] > (w = p->pdata->length()))
 					{
 						q.push(std::make_pair((dist[v] = w), v));
 						prev[v] = p;
@@ -220,7 +231,7 @@ namespace SI
 				pgraph->clear();
 				for (u = 0; u < n; ++u)
 					if (u^pu)
-						pgraph->addPath(prev[u]->start, u, *(prev[u]->pdata));
+						pgraph->addPath(*(prev[u]->pdata));//(prev[u]->start, u, *(prev[u]->pdata));
 			}
 			return rtn;
 		}
@@ -236,7 +247,7 @@ namespace SI
 			for (int i = 0; i < n; ++i) d[i][i] = 0;
 			for (int u = 0; u < n; ++u)
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
-					d[u][p->end] = p->pdata->length();
+					d[u][p->end()] = p->pdata->length();
 			for (int k = 0; k < n; ++k)
 				for (int i = 0; i < n; ++i)
 					for (int j = 0; j < n; ++j)

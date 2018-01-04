@@ -27,6 +27,18 @@
     <ClInclude Include="kernel_console_dll.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="siglobal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sigraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EdgeInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,6 +48,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="export.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EdgeInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

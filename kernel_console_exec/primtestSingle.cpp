@@ -1,4 +1,7 @@
 //
+//#ifndef SIGLOBAL_H
+//#define SIGLOBAL_H
+//
 //#include <cstring>
 //#include <vector>
 //#include <queue>
@@ -7,6 +10,23 @@
 //#include <cstdlib>
 //#include <iostream>
 //#include <algorithm>
+//
+//namespace SI
+//{
+//	template<class T>
+//	T Min(const T& a, const T& b)
+//	{
+//		return a < b ? a : b;
+//	}
+//
+//	template<class T>
+//	T Max(const T& a, const T& b)
+//	{
+//		return a > b ? a : b;
+//	}
+//}
+//
+//#endif // !SIGLOBAL_H
 //
 //#ifndef SIGRAPH_H
 //#define SIGRAPH_H
@@ -52,7 +72,7 @@
 //		typedef Edge<EdgeInfo> edge;
 //		typedef VertexInfo vertex;
 //		typedef pair<int, int> pii;
-//		//private:
+//		private:
 //	public:
 //		static const int INF = 1 << 29;
 //
@@ -120,7 +140,7 @@
 //		}
 //		void delPath(int u, int v)
 //		{
-//			//		if (n == 0)return;
+//					if (n == 0)return;
 //			edge* pp = NULL;
 //			edge* np = NULL;
 //			for (np = Elast[u]; np && np->end != v; np = np->next) pp = np;
@@ -140,7 +160,7 @@
 //			for (int i = 0; i < n; ++i) dist[i] = INF;
 //			dist[u] = 0;
 //			q.push(std::make_pair(0, u));
-//			//		int tu, tw;
+//					int tu, tw;
 //			for (int i = 1; i < n; ++i)
 //			{
 //				while (dist[q.top().second] != q.top().first)
@@ -211,7 +231,7 @@
 //			for (int i = 0; i < n; ++i) dist[i] = INF;
 //			dist[u] = 0;
 //			q.push(std::make_pair(0, u));
-//			for (int i = 1; i < n; ++i)
+//			for (int i = 0; i < n; ++i)
 //			{
 //				while (dist[q.top().second] != q.top().first)
 //					q.pop();
@@ -219,16 +239,16 @@
 //				rtn += q.top().first;
 //				q.pop();
 //				for (edge* p = Elast[u]; p != NULL; p = p->next)
-//					if (dist[v = p->end] >(w = p->pdata->length()))
+//					if (dist[v = p->end] >(w = p->pdata->length()) && (u^v))
 //					{
 //						q.push(std::make_pair((dist[v] = w), v));
 //						prev[v] = p;
 //					}
 //			}
-//			while (dist[q.top().second] != q.top().first)
-//				q.pop();
+//			/*	while (dist[q.top().second] != q.top().first)
+//			q.pop();
 //			rtn += q.top().first;
-//			if (pgraph != NULL)
+//			*/	if (pgraph != NULL)
 //			{
 //				pgraph->clear();
 //				for (u = 0; u < n; ++u)
@@ -236,6 +256,31 @@
 //						pgraph->addPath(prev[u]->start, u, *(prev[u]->pdata));
 //			}
 //			return rtn;
+//		}
+//
+//		void betweennessCenterality(int* c)
+//		{
+//			int** d;
+//			d = new int*[n];
+//			for (int i = 0; i < n; ++i)
+//				d[i] = new int[n];
+//			for (int i = 0; i < n; ++i)
+//				for (int j = 0; j < n; ++j) d[i][j] = INF;
+//			for (int i = 0; i < n; ++i) d[i][i] = 0;
+//			for (int u = 0; u < n; ++u)
+//				for (edge* p = Elast[u]; p != NULL; p = p->next)
+//					d[u][p->end] = p->pdata->length();
+//			for (int k = 0; k < n; ++k)
+//				for (int i = 0; i < n; ++i)
+//					for (int j = 0; j < n; ++j)
+//						d[i][j] = Min(d[i][j], d[i][k] + d[k][j]);
+//			for (int i = 0; i < n; ++i)
+//				for (int k = 0; k < n; ++k)
+//					for (int j = 0; j < n; ++j)
+//						c[k] += !(d[i][j] ^ (d[i][k] + d[k][j]));
+//			for (int i = 0; i < n; ++i)
+//				delete d[i];
+//			delete d;
 //		}
 //	};
 //
@@ -265,22 +310,28 @@
 //};
 //int n, m;
 //int u, v, w;
-//SIGraph<EdgeInfo, int>* pG;
+//SIGraph<EdgeInfo, int>* pG = NULL;
 //int dist[MAXN];
 //int main()
 //{
-//	cin >> n >> m;
-//	pG = new SIGraph<EdgeInfo, int>(n);
-//	for (; m; --m)
+//	int ans;
+//	cin >> n;
+//	while (n)
 //	{
-//		cin >> u >> v >> w;
-//		pG->addPath(u - 1, v - 1, EdgeInfo(w));
+//		if (pG != NULL) delete pG;
+//		pG = new SIGraph<EdgeInfo, int>(n);
+//		cin >> m;
+//		for (; m; --m)
+//		{
+//			cin >> u >> v >> w;
+//			--u;
+//			--v;
+//			pG->addPath(u, v, w);
+//			pG->addPath(v, u, w);
+//		}
+//		ans = pG->prim(0);
+//		cout << ans << endl;
+//		cin >> n;
 //	}
-//	cin >> u >> v;
-//	--u;
-//	//pG->dijkstra(u - 1, dist);
-//	for (int i = 0; i < n; ++i)
-//		pG->dijkstraStep(i, u, dist);
-//	cout << dist[v - 1] << endl;
 //	return 0;
 //}

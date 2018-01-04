@@ -2,6 +2,7 @@
 #define SIGLOBAL_H
 
 #include <cstring>
+#include <fstream>
 #include <vector>
 #include <queue>
 #include <map>

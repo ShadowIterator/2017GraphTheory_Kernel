@@ -146,14 +146,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EdgeInfo.h" />
     <ClInclude Include="siglobal.h" />
     <ClInclude Include="sigraph.h" />
+    <ClInclude Include="VertexInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dijkstratest.cpp" />
+    <ClCompile Include="EdgeInfo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="primtest.cpp" />
+    <ClCompile Include="primtestSingle.cpp" />
     <ClCompile Include="sigraph.cpp" />
+    <ClCompile Include="VertexInfo.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
