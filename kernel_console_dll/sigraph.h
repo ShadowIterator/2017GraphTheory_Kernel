@@ -167,18 +167,23 @@ namespace SI
 		int dijkstraStep(int stp, int u, int* dist, EdgeInfo* selEdge = NULL)
 		{
 			static priority_queue<pii, vector<pii>, Greater<pii> > q;
-			static edge** prev = NULL;//new edge*[n];
+			//static edge** prev = NULL;//new edge*[n];
+			static EdgeInfo** prev = NULL;
 			int v, w, rtn;
 			static int pu;
 			if (stp == 0)
 			{
-				if (prev != NULL)
+				/*if (prev != NULL)
 				{
 					for (int i = 0; i < n; ++i)
 						delList(prev[i]);
 					delete[] prev;
+				}*/
+				if (prev != NULL)
+				{
+					delete[] prev;
 				}
-				prev = new edge*[n];
+				prev = new EdgeInfo*[n];
 				while (!q.empty()) q.pop();
 				for (int i = 0; i < n; ++i) dist[i] = INF;
 				dist[pu = u] = 0;
@@ -188,14 +193,14 @@ namespace SI
 			while (dist[q.top().second] != q.top().first)
 				q.pop();
 			u = q.top().second;
-			if (selEdge != NULL && (pu^u)) *selEdge = *(prev[u]->pdata);
+			if (selEdge != NULL && (pu^u)) *selEdge = *prev[u];
 			rtn = dist[u];
 			q.pop();
 			for (edge* p = Elast[u]; p != NULL; p = p->next)
 				if (dist[v = p->end()] >(w = (dist[u] + p->pdata->length())))
 				{
 					q.push(std::make_pair((dist[v] = w), v));
-					prev[v] = p;
+					prev[v] = p->pdata;
 				}
 			return rtn;
 		}
