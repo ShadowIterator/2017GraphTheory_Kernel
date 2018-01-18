@@ -5,7 +5,7 @@
 //
 //using namespace std;
 //
-//using SI::Edge;
+////using SI::Edge;
 //using SI::SIGraph;
 //using SI::EdgeInfo;
 //using SI::VertexInfo;
@@ -17,6 +17,7 @@
 //int dist[MAXN];
 //int main()
 //{
+//	EdgeInfo ei;
 //	int ans;
 //	cin >> n;
 //	while (n)
@@ -26,13 +27,16 @@
 //		cin >> m;
 //		for (; m; --m)
 //		{
-//			cin >> u >> v >> w;
-//			--u;
-//			--v;
-//			pG->addPath(u, v, w);
-//			pG->addPath(v, u, w);
+//			cin >> ei;
+//			--ei.u;
+//			--ei.v;
+//			pG->addPath(ei);
+//			ei.u ^= ei.v ^= ei.u ^= ei.v;
+//			pG->addPath(ei);
 //		}
-//		ans=pG->prim(0);
+//		//ans=pG->prim(0);
+//		for (int i = 0; i < n; ++i)
+//			ans = pG->primStep(i, 0);
 //		cout << ans << endl;
 //		cin >> n; 
 //	}

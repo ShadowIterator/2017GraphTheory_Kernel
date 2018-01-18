@@ -155,6 +155,7 @@
     <ClInclude Include="sigraph.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="unionfind.h" />
     <ClInclude Include="VertexInfo.h" />
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +177,7 @@
     <ClCompile Include="export.cpp" />
     <ClCompile Include="kernel_console_dll.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="unionfind.cpp" />
     <ClCompile Include="VertexInfo.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

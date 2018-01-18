@@ -6,4 +6,9 @@ namespace SI
 	{
 
 	}
+	std::istream& operator >> (std::istream& in, VertexInfo& obj)
+	{
+		
+		return in;
+	}
 }

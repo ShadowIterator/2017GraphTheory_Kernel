@@ -15,20 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sigraph.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="siglobal.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="EdgeInfo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexInfo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="sigraph.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -50,5 +36,28 @@
     <ClCompile Include="VertexInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="unionfind.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="kruskaltest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EdgeInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="siglobal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sigraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="unionfind.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

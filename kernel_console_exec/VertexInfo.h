@@ -9,6 +9,7 @@ namespace SI
 	{
 	public:
 		VertexInfo();
+		friend std::istream& operator >> (std::istream& in, VertexInfo& obj);
 	};
 }
 
