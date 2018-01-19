@@ -25,7 +25,7 @@ using Graph = SI::SIGraph<EdgeInfo, VertexInfo>;
 
 extern "C" {
 
-	DllExport Graph* createGrahp_n(int n)
+	DllExport Graph* createGraph_n(int n)
 	{
 		Graph* pG = new Graph(n);
 		return pG;

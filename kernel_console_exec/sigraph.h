@@ -18,7 +18,7 @@ namespace SI
 		EdgeInfo* pdata;
 		EdgeNode* next;
 
-		EdgeNode() :pdata(NULL), next(NULL), end(0)
+		EdgeNode() :pdata(NULL), next(NULL)
 		{
 
 		}

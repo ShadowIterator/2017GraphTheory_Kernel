@@ -146,10 +146,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="connectivityTest.cpp" />
     <ClCompile Include="dijkstratest.cpp" />
     <ClCompile Include="EdgeInfo.cpp" />
     <ClCompile Include="kruskaltest.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="persistence_unionfind.cpp" />
     <ClCompile Include="primtest.cpp" />
     <ClCompile Include="primtestSingle.cpp" />
     <ClCompile Include="sigraph.cpp" />
@@ -158,6 +160,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EdgeInfo.h" />
+    <ClInclude Include="persistencearry.h" />
+    <ClInclude Include="persistence_unionfind.h" />
     <ClInclude Include="siglobal.h" />
     <ClInclude Include="sigraph.h" />
     <ClInclude Include="unionfind.h" />
