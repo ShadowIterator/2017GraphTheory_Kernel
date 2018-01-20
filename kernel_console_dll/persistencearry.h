@@ -55,7 +55,7 @@ namespace SI
 		{
 			memset(buffer, 0, bufSize * sizeof(node));
 			bufSize = 0;
-			totBuf = 0;
+			NBuf = 0;
 			root.clear();
 		}
 		void destroy()

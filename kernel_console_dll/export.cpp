@@ -137,6 +137,22 @@ extern "C" {
 		return pG->connectivityQuery(u, v, ST);
 	}
 
+	DllExport int connectivityCount(Graph* pG, int ST)
+	{
+		return pG->connectivityCount(ST);
+	}
+
+	DllExport int connectivitySize(Graph* pG,int u, int ST)
+	{
+		return pG->connectivitySize(u, ST);
+	}
+
+	DllExport int connectivityRep(Graph* pG, int u, int ST)
+	{
+		return pG->connectivityRep(u, ST);
+	}
+
+
 	DllExport void closenesscentrality(Graph* pG, int *c)
 	{
 		pG->closenesscentrality(c);

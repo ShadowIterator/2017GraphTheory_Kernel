@@ -153,7 +153,7 @@ namespace SI
 			q.push(std::make_pair(0, u));
 			for (int i = 1; i < n; ++i)
 			{
-				while (dist[q.top().second] != q.top().first)
+				while (!q.empty() && dist[q.top().second] != q.top().first)
 					q.pop();
 				if (q.empty()) return -1;
 				u = q.top().second;
@@ -198,7 +198,7 @@ namespace SI
 				q.push(std::make_pair(0, u));
 			}
 
-			while (dist[q.top().second] != q.top().first)
+			while (!q.empty() && dist[q.top().second] != q.top().first)
 				q.pop();
 			if (q.empty()) return -1;
 			u = q.top().second;
@@ -230,7 +230,7 @@ namespace SI
 			q.push(std::make_pair(0, u));
 			for (int i = 0; i < n; ++i)
 			{
-				while (used[q.top().second]) q.pop();
+				while (!q.empty()&&used[q.top().second]) q.pop();
 				if (q.empty()) return -1;
 				used[u = q.top().second] = 1;
 				rtn += q.top().first;
@@ -280,7 +280,7 @@ namespace SI
 				q.push(std::make_pair(0, u));
 			}
 
-			while (used[q.top().second]) q.pop();
+			while (!q.empty()&&used[q.top().second]) q.pop();
 			if (q.empty()) return -1;
 			used[u = q.top().second] = 1;
 			rtn += q.top().first;
@@ -424,6 +424,24 @@ namespace SI
 		{
 			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
 			return puf->getfath(k, u) == puf->getfath(k, v);
+		}
+
+		int connectivityCount(int ST)
+		{
+			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
+			return puf->count(k);
+		}
+
+		int connectivitySize(int u, int ST)
+		{
+			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
+			return puf->getsize(k, u);
+		}
+
+		int connectivityRep(int u, int ST)
+		{
+			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
+			return puf->getfath(k, u);
 		}
 
 		void closenesscentrality(int* c)
