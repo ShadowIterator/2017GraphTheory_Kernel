@@ -66,9 +66,9 @@ extern "C" {
 		return pG;
 	}
 
-	DllExport int dijkstraStep(Graph* pG, int stp, int u, int* dist, EdgeInfo* pE)
+	DllExport int dijkstraStep(Graph* pG, int stp, int u, int* dist, EdgeInfo* pE,EdgeInfo* pprev)
 	{
-		pG->dijkstraStep(stp, u, dist, pE);
+		return pG->dijkstraStep(stp, u, dist, pE, pprev);
 	}
 
 	DllExport int dijkstra(Graph* pG, int u, int* dist, Graph* pSG = NULL)
@@ -122,9 +122,9 @@ extern "C" {
 	@param [in] pG ptr_to_graph
 	@param [out] c the_ith_element_is_the_centerality_of_the_ith_vertex
 	*/
-	DllExport void betweennessCenterality(Graph* pG, int* c)
+	DllExport void betweennessCentrality(Graph* pG, int* c)
 	{
-		return pG->betweennessCenterality(c);
+		return pG->betweennessCentrality(c);
 	}
 
 	DllExport void connectivityInit(Graph* pG)
@@ -135,5 +135,10 @@ extern "C" {
 	DllExport bool connectivityQuery(Graph* pG, int u, int v, int ST)
 	{
 		return pG->connectivityQuery(u, v, ST);
+	}
+
+	DllExport void closenesscentrality(Graph* pG, int *c)
+	{
+		pG->closenesscentrality(c);
 	}
 }

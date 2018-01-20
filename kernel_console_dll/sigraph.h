@@ -176,7 +176,7 @@ namespace SI
 			return 0;
 		}
 
-		int dijkstraStep(int stp, int u, int* dist, EdgeInfo* selEdge = NULL)
+		int dijkstraStep(int stp, int u, int* dist, EdgeInfo* selEdge = NULL, EdgeInfo* rprev = NULL)
 		{
 			static priority_queue<pii, vector<pii>, Greater<pii> > q;
 			static EdgeInfo** prev = NULL;
@@ -191,6 +191,9 @@ namespace SI
 				prev = new EdgeInfo*[n];
 				while (!q.empty()) q.pop();
 				for (int i = 0; i < n; ++i) dist[i] = INF;
+				if (rprev != NULL)
+					for (int i = 0; i < n; ++i)
+						rprev[i].setInfo(-1, -1, -1);
 				dist[pu = u] = 0;
 				q.push(std::make_pair(0, u));
 			}
@@ -200,6 +203,7 @@ namespace SI
 			if (q.empty()) return -1;
 			u = q.top().second;
 			if (selEdge != NULL && (pu^u)) *selEdge = *prev[u];
+			if (rprev != NULL && (pu^u)) rprev[u] = *prev[u];
 			rtn = dist[u];
 			q.pop();
 			for (edge* p = Elast[u]; p != NULL; p = p->next)
@@ -413,7 +417,7 @@ namespace SI
 				//	cout << puf->getfath(puf->sizeq() - 1, u) << " ";
 				//cout << endl;
 			}
-			sort(wl + 1, wl + 1 + m, cmp_greater);
+			std::sort(wl + 1, wl + 1 + m, cmp_greater);
 		}
 
 		bool connectivityQuery(int u, int v, int ST)
@@ -422,7 +426,19 @@ namespace SI
 			return puf->getfath(k, u) == puf->getfath(k, v);
 		}
 
-		void betweennessCenterality(int* c)
+		void closenesscentrality(int* c)
+		{
+			int* dist = new int[n];
+			for (int u = 0; u < n; ++u)
+			{
+				dijkstra(u, dist);
+				c[u] = 0;
+				for (int i = 0; i < u; ++i)
+					c[u] += dist[i];
+			}
+		}
+
+		void betweennessCentrality(int* c)
 		{
 			int** d;
 			d = new int*[n];
