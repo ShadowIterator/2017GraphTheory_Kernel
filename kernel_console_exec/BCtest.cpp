@@ -1,3 +1,4 @@
+//#define _CRT_SECURE_NO_WARNINGS
 //#include"siglobal.h"
 //#include"persistence_unionfind.h"
 //#include"sigraph.h"
@@ -6,7 +7,7 @@
 //
 //using namespace std;
 //
-//using PUF=SI::Persistence_UnionFind;
+//using PUF = SI::Persistence_UnionFind;
 //
 //const int MAXN = 1005;
 //const int MAXM = 10000;
@@ -45,6 +46,8 @@
 //SIGraph<EdgeInfo, VertexInfo>* pG = NULL;
 //int main()
 //{
+//	freopen("filmgraph.txt", "r", stdin);
+//	freopen("res.out", "w", stdout);
 //	int n, m, q;
 //	int u, v, w;
 //	int k;
@@ -53,49 +56,27 @@
 //	pG = new SIGraph<EdgeInfo, VertexInfo>(n);
 //	for (int i = 1; i <= m; ++i)
 //	{
-//		//cin >> st[i] >> ed[i] >> ww[i];
 //		cin >> ei;
 //		pG->addPath(ei);
+//		ei.u ^= ei.v ^= ei.u ^= ei.v;
+//		pG->addPath(ei);
 //	}
-//	/*for (int i = 1; i <= m; ++i) rk[i] = i;
-//	sort(rk + 1, rk + 1 + m, cmp_rk);
-//	for (int i = 1; i <= m; ++i)
-//		uf.merge(st[rk[i]], ed[rk[i]]);
-//	sort(ww + 1, ww + 1 + m, cmp_greater);
-//	ww[m + 1] = 1 << 29;*/
-//	pG->connectivityInit();
-//	for (cin >> q; q; --q)
-//	{
-//		cin >> u >> v >> w;
-//		// k = binSearch(ww, 1, m + 1);
-//		/*k = upper_bound(ww + 1, ww + 1 + m, w, cmp_greater) - ww - 1;
-//		cout << (uf.getfath(k, u) == uf.getfath(k, v)) << endl;*/
-//		cout << pG->connectivityQuery(u, v, w) << endl;
-//	}
+//	int* c = new int[n];
+////	pG->betweennessCentralityImproved(c);
+//	//pG->betweennessCentrality(c);
+//
+//	//pG->closenesscentrality(c);
+//	for (int i = 0; i < n; ++i)
+//		cout << c[i] << endl;
 //	return 0;
 //}
 ///*
-//4 4
+//5 4
 //0 1 5
 //1 2 7
 //1 3 2
-//3 0 3
+//3 0 2
 //10
 //0 1 2
 //
-//10 3
-//10 1 30
-//3 1 28
-//10 1 1
-//10
-//9 7 26
-//5 10 23
-//9 6 37
-//6 3 41
-//1 9 46
-//8 8 5
-//7 6 17
-//5 6 19
-//6 4 34
-//9 4 8
 //*/

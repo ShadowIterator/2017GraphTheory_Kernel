@@ -61,12 +61,13 @@ namespace SI
 		static const int INF = 1 << 29;
 
 		int n, m;
+		int sz;
 		EdgeNode<EdgeInfo>** Elast;
 		VertexInfo* V;
 		PUF* puf;
 		int* wl;
 	public:
-		SIGraph(int tn = 0) :n(tn), m(0), Elast(NULL), V(NULL), wl(NULL), puf(NULL)
+		SIGraph(int tn = 0) :sz(tn), n(tn), m(0), Elast(NULL), V(NULL), wl(NULL), puf(NULL)
 		{
 			if (!n) return;
 			_allocBuffer();
@@ -104,8 +105,11 @@ namespace SI
 			for (int i = 0; i < n; ++i)
 				delete V[i];
 			delete[] V;
+			if (puf != NULL) delete puf;
+			if (wl != NULL) delete[] wl;
 			Elast = V = NULL;
-			n = m = 0;
+			puf = wl = NULL;
+			n = m = sz = 0;
 		}
 		void appendSize(int nn)
 		{
@@ -119,11 +123,11 @@ namespace SI
 			memset(nV + n, 0, (nn - n) * sizeof(vertex*));
 			delete[] V;
 			V = nV;
-			n = nn;
+			n = sz = nn;
 		}
 		void addPath(const EdgeInfo& ei)
 		{
-		//	cout << ei.start() << endl;
+			//	cout << ei.start() << endl;
 			edge* ne = new edge(Elast[ei.start()], ei);
 			Elast[ei.start()] = ne;
 			++m;
@@ -153,13 +157,13 @@ namespace SI
 			q.push(std::make_pair(0, u));
 			for (int i = 1; i < n; ++i)
 			{
-				while (dist[q.top().second] != q.top().first)
+				while (!q.empty() && dist[q.top().second] != q.top().first)
 					q.pop();
 				if (q.empty()) return -1;
 				u = q.top().second;
 				q.pop();
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
-					if (dist[v = p->end()] > (w = (dist[u] + p->pdata->length())))
+					if (dist[v = p->end()] >(w = (dist[u] + p->pdata->length())))
 					{
 						q.push(std::make_pair((dist[v] = w), v));
 						prev[v] = p;
@@ -176,7 +180,7 @@ namespace SI
 			return 0;
 		}
 
-		int dijkstraStep(int stp, int u, int* dist, EdgeInfo* selEdge = NULL)
+		int dijkstraStep(int stp, int u, int* dist, EdgeInfo* selEdge = NULL, EdgeInfo* rprev = NULL)
 		{
 			static priority_queue<pii, vector<pii>, Greater<pii> > q;
 			static EdgeInfo** prev = NULL;
@@ -191,15 +195,19 @@ namespace SI
 				prev = new EdgeInfo*[n];
 				while (!q.empty()) q.pop();
 				for (int i = 0; i < n; ++i) dist[i] = INF;
+				if (rprev != NULL)
+					for (int i = 0; i < n; ++i)
+						rprev[i].setInfo(-1, -1, -1);
 				dist[pu = u] = 0;
 				q.push(std::make_pair(0, u));
 			}
 
-			while (dist[q.top().second] != q.top().first)
+			while (!q.empty() && dist[q.top().second] != q.top().first)
 				q.pop();
 			if (q.empty()) return -1;
 			u = q.top().second;
 			if (selEdge != NULL && (pu^u)) *selEdge = *prev[u];
+			if (rprev != NULL && (pu^u)) rprev[u] = *prev[u];
 			rtn = dist[u];
 			q.pop();
 			for (edge* p = Elast[u]; p != NULL; p = p->next)
@@ -226,13 +234,13 @@ namespace SI
 			q.push(std::make_pair(0, u));
 			for (int i = 0; i < n; ++i)
 			{
-				while (used[q.top().second]) q.pop();
+				while (!q.empty() && used[q.top().second]) q.pop();
 				if (q.empty()) return -1;
 				used[u = q.top().second] = 1;
 				rtn += q.top().first;
 				q.pop();
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
-					if (!used[v = p->end()] && dist[v] > (w = p->pdata->length()))
+					if (!used[v = p->end()] && dist[v] >(w = p->pdata->length()))
 					{
 						q.push(std::make_pair((dist[v] = w), v));
 						prev[v] = p;
@@ -276,7 +284,7 @@ namespace SI
 				q.push(std::make_pair(0, u));
 			}
 
-			while (used[q.top().second]) q.pop();
+			while (!q.empty() && used[q.top().second]) q.pop();
 			if (q.empty()) return -1;
 			used[u = q.top().second] = 1;
 			rtn += q.top().first;
@@ -356,24 +364,24 @@ namespace SI
 			return true;
 		}
 
-	/*	bool cmp_rk(int i, int j)
+		/*	bool cmp_rk(int i, int j)
 		{
-			return wl[i] > wl[j];
+		return wl[i] > wl[j];
 		}*/
 
 		void QSort_rk(int* a, int l, int r, int *w)
 		{
 			if (l >= r) return;
-			a[0] = a[l];
+			int t = a[l];
 			int i = l, j = r;
 			while (i < j)
 			{
-				while (i < j && w[a[j]] <= w[a[0]]) --j;
+				while (i < j && w[a[j]] <= w[t]) --j;
 				a[i] = a[j];
-				while (i < j&&w[a[i]] >= w[a[0]]) ++i;
+				while (i < j&&w[a[i]] >= w[t]) ++i;
 				a[j] = a[i];
 			}
-			a[i] = a[0];
+			a[i] = t;
 			QSort_rk(a, l, i - 1, w);
 			QSort_rk(a, i + 1, r, w);
 		}
@@ -387,15 +395,15 @@ namespace SI
 		{
 			puf = new PUF(n, m);
 
-		/*	for (int i = 0; i < n; ++i)
-				cout << puf->getfath(puf->sizeq() - 1, i) << " ";*/
+			/*	for (int i = 0; i < n; ++i)
+			cout << puf->getfath(puf->sizeq() - 1, i) << " ";*/
 
 			wl = new  int[m + 1];
 			int* rk = new int[m + 1];
 			int* st = new int[m + 1];
 			int* ed = new int[m + 1];
 			int totE = 0;
-			for(int u=0;u<n;++u)
+			for (int u = 0; u<n; ++u)
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
 				{
 					st[++totE] = p->pdata->start();
@@ -413,7 +421,10 @@ namespace SI
 				//	cout << puf->getfath(puf->sizeq() - 1, u) << " ";
 				//cout << endl;
 			}
-			sort(wl + 1, wl + 1 + m, cmp_greater);
+			std::sort(wl + 1, wl + 1 + m, cmp_greater);
+			delete[] rk;
+			delete[] st;
+			delete[] ed;
 		}
 
 		bool connectivityQuery(int u, int v, int ST)
@@ -422,7 +433,72 @@ namespace SI
 			return puf->getfath(k, u) == puf->getfath(k, v);
 		}
 
-		void betweennessCenterality(int* c)
+		int connectivityCount(int ST)
+		{
+			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
+			return puf->count(k);
+		}
+
+		int connectivitySize(int u, int ST)
+		{
+			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
+			return puf->getsize(k, u);
+		}
+
+		int connectivityRep(int u, int ST)
+		{
+			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
+			return puf->getfath(k, u);
+		}
+
+		void closenesscentrality(int* c)
+		{
+			int* dist = new int[n];
+			for (int u = 0; u < n; ++u)
+			{
+				dijkstra(u, dist);
+				c[u] = 0;
+				for (int i = 0; i < u; ++i)
+					c[u] += dist[i];
+			}
+			delete[] dist;
+		}
+
+		void _calcSigmas(int* dist, int *id, int *temp)
+		{
+			int u, v;
+			memset(temp, 0, n * sizeof(int));
+			QSort_rk(id, 0, n - 1, dist);
+			for (int i = 0; i < n ; ++i)
+			{
+				//if (!(i^src)) continue;
+				for (edge* p = Elast[u = id[i]]; p != NULL; p = p->next)
+				{
+					if (dist[u] + p->pdata->length() == dist[v = p->pdata->end()])
+						temp[u] += temp[p->pdata->end()] + 1;
+				}
+			}
+		}
+
+		void betweennessCentralityImproved(int* c)
+		{
+			int *dist = new int[n];
+			int *temp = new int[n];
+			int *id = new int[n];
+			memset(c, 0, n * sizeof(int));
+			for (int u = 0; u < n; ++u) id[u] = u;
+			for (int u = 0; u < n; ++u)
+			{
+				dijkstra(u, dist);
+				_calcSigmas(dist, id, temp);
+				for (int i = 0; i < n; ++i) c[i] += temp[i];
+			}
+			delete[] dist;
+			delete[] temp;
+			delete[] id;
+		}
+
+		void betweennessCentrality(int* c)
 		{
 			int** d;
 			d = new int*[n];
@@ -446,8 +522,47 @@ namespace SI
 				delete d[i];
 			delete d;
 		}
-	};
 
+		void exportGraph(int u, int ST, SIGraph* pgraph)
+		{
+			int* Q = new int[n + 1];
+			char* used = new char[n];
+			int head = 0, tail = 0;
+			int v;
+			memset(used, 0, n * sizeof(char));
+			pgraph->clear();
+			Q[tail++] = u;
+			used[u] = 1;
+			while (head^tail)
+			{
+				u = Q[head++];
+				for (edge* p = Elast[u]; p != NULL; p = p->next)
+				{
+					if (p->pdata->length() < ST) continue;
+					pgraph->addPath(*(p->pdata));
+					if (!used[v = p->pdata->end()])
+					{
+						Q[tail++] = v;
+						used[v] = 1;
+					}
+				}
+			}
+			sz = tail;
+			delete[] Q;
+			delete[] used;
+		}
+
+		void printGraph()
+		{
+			cout << sz << " " << m << endl;
+			for(int u=0;u<n;++u)
+				for (edge* p = Elast[u]; p != NULL; p = p->next)
+				{
+					cout << p->pdata->start() << " " << p->pdata->end() << " " << p->pdata->length() << endl;
+				}
+		}
+	};
+	
 }
 
 #endif // !SIGRAPH_H

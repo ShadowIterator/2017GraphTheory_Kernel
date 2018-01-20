@@ -146,9 +146,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BCtest.cpp" />
     <ClCompile Include="connectivityTest.cpp" />
     <ClCompile Include="dijkstratest.cpp" />
     <ClCompile Include="EdgeInfo.cpp" />
+    <ClCompile Include="exporttest.cpp" />
     <ClCompile Include="kruskaltest.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="persistence_unionfind.cpp" />

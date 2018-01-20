@@ -48,6 +48,12 @@
     <ClCompile Include="connectivityTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="BCtest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="exporttest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EdgeInfo.h">
