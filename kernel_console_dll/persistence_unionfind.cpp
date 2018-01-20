@@ -24,7 +24,8 @@ namespace SI
 	int Persistence_UnionFind::getfath(int x, int u)
 	{
 		int fa;
-		while ((fa = fath.at(x, u)) != u) u = fa;
+		while ((fa = fath.at(x, u)) != u) 
+			u = fa;
 		return fa;
 	}
 
@@ -64,5 +65,10 @@ namespace SI
 	Persistence_UnionFind::~Persistence_UnionFind()
 	{
 
+	}
+
+	int Persistence_UnionFind::sizeq()
+	{
+		return fath.sizeq();
 	}
 }

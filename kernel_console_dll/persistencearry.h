@@ -49,7 +49,7 @@ namespace SI
 			while (n >> logn) ++logn;
 			root.resize(q);
 			root.clear();
-			_allocBuffer(q * logn);
+			_allocBuffer(q * logn + n);
 		}
 		void clear()
 		{

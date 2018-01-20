@@ -17,6 +17,7 @@ namespace SI
 		int getfath(int x,int u);
 		void merge(int u, int v);
 		void resume(int k);
+		int sizeq();
 		~Persistence_UnionFind();
 	};
 }

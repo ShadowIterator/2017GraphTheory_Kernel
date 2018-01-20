@@ -3,6 +3,7 @@
 
 #include "siglobal.h"
 #include "unionfind.h"
+#include "persistence_unionfind.h"
 
 #define mp(a,b) make_pair(a,b)
 
@@ -11,6 +12,7 @@ namespace SI
 	using std::priority_queue;
 	using std::pair;
 	using std::vector;
+	using PUF = Persistence_UnionFind;
 	template<class EdgeInfo>
 	class EdgeNode
 	{
@@ -61,8 +63,10 @@ namespace SI
 		int n, m;
 		EdgeNode<EdgeInfo>** Elast;
 		VertexInfo* V;
+		PUF* puf;
+		int* wl;
 	public:
-		SIGraph(int tn = 0) :n(tn), m(0), Elast(NULL), V(NULL)
+		SIGraph(int tn = 0) :n(tn), m(0), Elast(NULL), V(NULL), wl(NULL), puf(NULL)
 		{
 			if (!n) return;
 			_allocBuffer();
@@ -119,6 +123,7 @@ namespace SI
 		}
 		void addPath(const EdgeInfo& ei)
 		{
+		//	cout << ei.start() << endl;
 			edge* ne = new edge(Elast[ei.start()], ei);
 			Elast[ei.start()] = ne;
 			++m;
@@ -136,7 +141,7 @@ namespace SI
 			--m;
 		}
 		//No out_of_range test
-		void dijkstra(int u, int* dist, SIGraph* pgraph = NULL)
+		int dijkstra(int u, int* dist, SIGraph* pgraph = NULL)
 		{
 			static priority_queue<pii, vector<pii>, Greater<pii> > q;
 			int v, w;
@@ -150,10 +155,11 @@ namespace SI
 			{
 				while (dist[q.top().second] != q.top().first)
 					q.pop();
+				if (q.empty()) return -1;
 				u = q.top().second;
 				q.pop();
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
-					if (dist[v = p->end()] >(w = (dist[u] + p->pdata->length())))
+					if (dist[v = p->end()] > (w = (dist[u] + p->pdata->length())))
 					{
 						q.push(std::make_pair((dist[v] = w), v));
 						prev[v] = p;
@@ -167,6 +173,7 @@ namespace SI
 						pgraph->addPath(*(prev[u]->pdata));//(prev[u]->start, u, *(prev[u]->pdata));
 			}
 			delete[] prev;
+			return 0;
 		}
 
 		int dijkstraStep(int stp, int u, int* dist, EdgeInfo* selEdge = NULL)
@@ -190,12 +197,13 @@ namespace SI
 
 			while (dist[q.top().second] != q.top().first)
 				q.pop();
+			if (q.empty()) return -1;
 			u = q.top().second;
 			if (selEdge != NULL && (pu^u)) *selEdge = *prev[u];
 			rtn = dist[u];
 			q.pop();
 			for (edge* p = Elast[u]; p != NULL; p = p->next)
-				if (dist[v = p->end()] >(w = (dist[u] + p->pdata->length())))
+				if (dist[v = p->end()] > (w = (dist[u] + p->pdata->length())))
 				{
 					q.push(std::make_pair((dist[v] = w), v));
 					prev[v] = p->pdata;
@@ -219,11 +227,12 @@ namespace SI
 			for (int i = 0; i < n; ++i)
 			{
 				while (used[q.top().second]) q.pop();
+				if (q.empty()) return -1;
 				used[u = q.top().second] = 1;
 				rtn += q.top().first;
 				q.pop();
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
-					if (!used[v = p->end()] && dist[v] >(w = p->pdata->length()))
+					if (!used[v = p->end()] && dist[v] > (w = p->pdata->length()))
 					{
 						q.push(std::make_pair((dist[v] = w), v));
 						prev[v] = p;
@@ -268,12 +277,13 @@ namespace SI
 			}
 
 			while (used[q.top().second]) q.pop();
+			if (q.empty()) return -1;
 			used[u = q.top().second] = 1;
 			rtn += q.top().first;
 			q.pop();
 			if (selEdge != NULL && (u^pu)) *selEdge = *prev[u];
 			for (edge* p = Elast[u]; p != NULL; p = p->next)
-				if (!used[v = p->end()] && dist[v] >(w = p->pdata->length()))
+				if (!used[v = p->end()] && dist[v] > (w = p->pdata->length()))
 				{
 					q.push(std::make_pair((dist[v] = w), v));
 					prev[v] = p->pdata;
@@ -302,7 +312,7 @@ namespace SI
 
 			for (int i = 1; i < n; ++i)
 			{
-				while (k < totE && (UF->getfath(u = (edges[k]->u)) == UF->getfath(v = edges[k]->v))) 
+				while (k < totE && (UF->getfath(u = (edges[k]->u)) == UF->getfath(v = edges[k]->v)))
 					++k;
 				if (!(k^totE)) break;
 				rtn += edges[k]->w;
@@ -322,7 +332,7 @@ namespace SI
 			int u, v;
 			static UnionFind* UF = NULL; //new UnionFind(n);
 			static EdgeInfo** edges = NULL;// = new EdgeInfo*[m];
-			
+
 			if (!stp)
 			{
 				if (UF != NULL) delete UF;
@@ -336,7 +346,7 @@ namespace SI
 						edges[totE++] = p->pdata;
 				std::sort(edges, edges + totE, cmp_EdgeInfoStar_w_smaller);
 			}
-			
+
 
 			while (k < totE && (UF->getfath(u = (edges[k]->u)) == UF->getfath(v = edges[k]->v)))
 				++k;
@@ -344,6 +354,72 @@ namespace SI
 			*selEdge = *edges[k];
 			UF->merge(u, v);
 			return true;
+		}
+
+	/*	bool cmp_rk(int i, int j)
+		{
+			return wl[i] > wl[j];
+		}*/
+
+		void QSort_rk(int* a, int l, int r, int *w)
+		{
+			if (l >= r) return;
+			a[0] = a[l];
+			int i = l, j = r;
+			while (i < j)
+			{
+				while (i < j && w[a[j]] <= w[a[0]]) --j;
+				a[i] = a[j];
+				while (i < j&&w[a[i]] >= w[a[0]]) ++i;
+				a[j] = a[i];
+			}
+			a[i] = a[0];
+			QSort_rk(a, l, i - 1, w);
+			QSort_rk(a, i + 1, r, w);
+		}
+
+		static bool cmp_greater(int a, int b)
+		{
+			return a > b;
+		}
+
+		void connectivityInit()
+		{
+			puf = new PUF(n, m);
+
+		/*	for (int i = 0; i < n; ++i)
+				cout << puf->getfath(puf->sizeq() - 1, i) << " ";*/
+
+			wl = new  int[m + 1];
+			int* rk = new int[m + 1];
+			int* st = new int[m + 1];
+			int* ed = new int[m + 1];
+			int totE = 0;
+			for(int u=0;u<n;++u)
+				for (edge* p = Elast[u]; p != NULL; p = p->next)
+				{
+					st[++totE] = p->pdata->start();
+					ed[totE] = p->pdata->end();
+					wl[totE] = p->pdata->length();
+					rk[totE] = totE;
+				}
+			//std::sort(rk + 1, rk + 1 + m, &SIGraph::cmp_rk);
+			QSort_rk(rk, 1, m, wl);
+
+			for (int i = 1; i <= totE; ++i)
+			{
+				puf->merge(st[rk[i]], ed[rk[i]]);
+				//for (int u = 0; u < n; ++u)
+				//	cout << puf->getfath(puf->sizeq() - 1, u) << " ";
+				//cout << endl;
+			}
+			sort(wl + 1, wl + 1 + m, cmp_greater);
+		}
+
+		bool connectivityQuery(int u, int v, int ST)
+		{
+			int k = std::upper_bound(wl + 1, wl + 1 + m, ST, cmp_greater) - wl - 1;
+			return puf->getfath(k, u) == puf->getfath(k, v);
 		}
 
 		void betweennessCenterality(int* c)

@@ -66,14 +66,14 @@ extern "C" {
 		return pG;
 	}
 
-	DllExport void dijkstraStep(Graph* pG, int stp, int u, int* dist, EdgeInfo* pE)
+	DllExport int dijkstraStep(Graph* pG, int stp, int u, int* dist, EdgeInfo* pE)
 	{
 		pG->dijkstraStep(stp, u, dist, pE);
 	}
 
-	DllExport void dijkstra(Graph* pG, int u, int* dist, Graph* pSG = NULL)
+	DllExport int dijkstra(Graph* pG, int u, int* dist, Graph* pSG = NULL)
 	{
-		pG->dijkstra(u, dist, pSG);
+		return pG->dijkstra(u, dist, pSG);
 	}
 
 	/**
@@ -125,5 +125,15 @@ extern "C" {
 	DllExport void betweennessCenterality(Graph* pG, int* c)
 	{
 		return pG->betweennessCenterality(c);
+	}
+
+	DllExport void connectivityInit(Graph* pG)
+	{
+		pG->connectivityInit();
+	}
+
+	DllExport bool connectivityQuery(Graph* pG, int u, int v, int ST)
+	{
+		return pG->connectivityQuery(u, v, ST);
 	}
 }

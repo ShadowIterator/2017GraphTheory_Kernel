@@ -65,4 +65,9 @@ namespace SI
 	{
 
 	}
+
+	int Persistence_UnionFind::sizeq()
+	{
+		return fath.sizeq();
+	}
 }
