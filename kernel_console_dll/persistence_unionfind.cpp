@@ -2,7 +2,7 @@
 
 namespace SI
 {
-	Persistence_UnionFind::Persistence_UnionFind(int tn, int tq) :fath(tn, tq), rank(tn, tq)
+	Persistence_UnionFind::Persistence_UnionFind(int tn, int tq) :fath(tn, tq), rank(tn, tq), cnt(1, tq)
 	{
 		int *temp = new int[tn];
 		for (int i = 0; i < tn; ++i)
@@ -11,6 +11,13 @@ namespace SI
 		for (int i = 0; i < tn; ++i)
 			temp[i] = 1;
 		rank.init(temp, tn);
+		temp[0] = tn;
+		cnt.init(temp, 1);
+	}
+
+	int Persistence_UnionFind::count(int k)
+	{
+		return cnt.at(k, 0);
 	}
 
 	void Persistence_UnionFind::resize(int tn, int tq)
@@ -19,6 +26,8 @@ namespace SI
 		fath.allocBuffer(tn, tq);
 		rank.destroy();
 		rank.allocBuffer(tn, tq);
+		cnt.destroy();
+		cnt.allocBuffer(1, tq);
 	}
 
 	int Persistence_UnionFind::getfath(int x, int u)
@@ -38,6 +47,7 @@ namespace SI
 		{
 			fath.nopmodify();
 			rank.nopmodify();
+			cnt.nopmodify();
 			return;
 		}
 		int rku = rank.at(lastm, u);
@@ -54,12 +64,14 @@ namespace SI
 			fath.modify(u, v);
 			rank.nopmodify();
 		}
+		cnt.modify(0, cnt.at(cnt.sizeq() - 1, 0) - 1);
 	}
 
 	void Persistence_UnionFind::resume(int k)
 	{
 		fath.resume(k);
 		rank.resume(k);
+		cnt.resume(k);
 	}
 
 	Persistence_UnionFind::~Persistence_UnionFind()
