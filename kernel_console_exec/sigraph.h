@@ -3,9 +3,16 @@
 
 #include "siglobal.h"
 #include "unionfind.h"
+#include"EdgeInfo.h"
+#include"VertexInfo.h"
 #include "persistence_unionfind.h"
+#include<windows.h>
 
 #define mp(a,b) make_pair(a,b)
+
+using std::cout;
+using std::endl;
+using std::thread;
 
 namespace SI
 {
@@ -13,6 +20,11 @@ namespace SI
 	using std::pair;
 	using std::vector;
 	using PUF = Persistence_UnionFind;
+	
+//	struct ThreadArg;
+////	template<class EdgeInfo,class VertexInfo>
+//	void betweennessCentralityImprovedT(ThreadArg* arg);
+
 	template<class EdgeInfo>
 	class EdgeNode
 	{
@@ -66,6 +78,14 @@ namespace SI
 		VertexInfo* V;
 		PUF* puf;
 		int* wl;
+
+		struct ThreadArg
+		{
+			int l;
+			int r;
+			int* c;
+			SIGraph<EdgeInfo, VertexInfo>* pG;
+		};
 	public:
 		SIGraph(int tn = 0) :sz(tn), n(tn), m(0), Elast(NULL), V(NULL), wl(NULL), puf(NULL)
 		{
@@ -147,7 +167,8 @@ namespace SI
 		//No out_of_range test
 		int dijkstra(int u, int* dist, SIGraph* pgraph = NULL)
 		{
-			static priority_queue<pii, vector<pii>, Greater<pii> > q;
+		//	cout << "dijkstra_begin " << this <<" " <<dist << endl;
+			priority_queue<pii, vector<pii>, Greater<pii> > q;
 			int v, w;
 			int pu = u;
 			edge** prev = new edge*[n];
@@ -157,6 +178,7 @@ namespace SI
 			q.push(std::make_pair(0, u));
 			for (int i = 1; i < n; ++i)
 			{
+				//cout << "dij. no. " << i << " " << this << endl;
 				while (!q.empty() && dist[q.top().second] != q.top().first)
 					q.pop();
 				if (q.empty()) return -1;
@@ -333,7 +355,7 @@ namespace SI
 			return rtn;
 		}
 
-		bool KruskalStep(int stp, EdgeInfo* selEdge = NULL)
+		bool KruskalStep(int stp, EdgeInfo* selEdge, int ST)
 		{
 			static int totE;// = 0;
 			static int k;// = 0;
@@ -351,7 +373,7 @@ namespace SI
 				edges = new EdgeInfo*[m];
 				for (int u = 0; u < n; ++u)
 					for (edge*p = Elast[u]; p != NULL; p = p->next)
-						edges[totE++] = p->pdata;
+						if (p->pdata->length() >= ST) edges[totE++] = p->pdata;
 				std::sort(edges, edges + totE, cmp_EdgeInfoStar_w_smaller);
 			}
 
@@ -466,10 +488,11 @@ namespace SI
 
 		void _calcSigmas(int* dist, int *id, int *temp)
 		{
+//			cout << "calc " << this << endl;
 			int u, v;
 			memset(temp, 0, n * sizeof(int));
 			QSort_rk(id, 0, n - 1, dist);
-			for (int i = 0; i < n ; ++i)
+			for (int i = 0; i < n; ++i)
 			{
 				//if (!(i^src)) continue;
 				for (edge* p = Elast[u = id[i]]; p != NULL; p = p->next)
@@ -478,24 +501,80 @@ namespace SI
 						temp[u] += temp[p->pdata->end()] + 1;
 				}
 			}
+//			cout << "calc_done " << this << endl;
 		}
 
-		void betweennessCentralityImproved(int* c)
+		
+		static void betweennessCentralityImprovedT(ThreadArg* arg)
 		{
+			SIGraph* pG = arg->pG;
+			int n = pG->n;
+			int* c = arg->c;
+			int l = arg->l;
+			int r = arg->r;
 			int *dist = new int[n];
 			int *temp = new int[n];
 			int *id = new int[n];
+			//		cout << l << " " << r << " begin" << endl;
 			memset(c, 0, n * sizeof(int));
 			for (int u = 0; u < n; ++u) id[u] = u;
-			for (int u = 0; u < n; ++u)
+			for (int u = l; u < r; ++u)
 			{
-				dijkstra(u, dist);
-				_calcSigmas(dist, id, temp);
-				for (int i = 0; i < n; ++i) c[i] += temp[i];
+				//			cout << "proc begin " << u << endl;
+				pG->dijkstra(u, dist);
+				pG->_calcSigmas(dist, id, temp);
+				for (int i = 0; i < n; ++i)
+					c[i] += temp[i];
+				//			cout<<"proc done " << u << endl;
 			}
 			delete[] dist;
 			delete[] temp;
 			delete[] id;
+			//		cout << l << " " << r << " end" << endl;
+		}
+
+		void betweennessCentralityImproved(int* c)
+		{
+			int* c1 = new int[n];
+			int* c2 = new int[n];
+			int* c3 = new int[n];
+			int* c4 = new int[n];
+			ThreadArg arg1, arg2, arg3, arg4;;
+			//SIGraph* pnG = new SIGraph(n);
+			//for (int u = 0; u < n; ++u)
+			//	for (edge* p = Elast[u]; p != NULL; p = p->next)
+			//		pnG->addPath(*(p->pdata));
+//			cout << "gen data done" << endl;
+			arg1.c = c1;
+			arg1.l = 0;
+			arg1.r = (n >> 2);
+			arg1.pG = this;
+			arg2.c = c2;
+			arg2.l = arg1.r;
+			arg2.r = (n >> 1);
+			arg2.pG = this;
+			arg3.c = c3;
+			arg3.l = arg2.r;
+			arg3.r = (n >> 2) * 3;;
+			arg3.pG = this;
+			arg4.c = c4;
+			arg4.l = arg3.r;
+			arg4.r = n;
+			arg4.pG = this;
+			thread t1(betweennessCentralityImprovedT, &arg1);
+			thread t2(betweennessCentralityImprovedT, &arg2);
+			thread t3(betweennessCentralityImprovedT, &arg3);
+			thread t4(betweennessCentralityImprovedT, &arg4);
+//			cout << "create thread" << endl;
+			t1.join();
+			//std::Sleep(100);
+			t2.join();
+			t3.join();
+			t4.join();
+//			cout << "done" << endl;
+			for (int i = 0; i < n; ++i)
+				c[i] = c1[i] + c2[i] + c3[i] + c4[i];
+
 		}
 
 		void betweennessCentrality(int* c)
@@ -555,14 +634,26 @@ namespace SI
 		void printGraph()
 		{
 			cout << sz << " " << m << endl;
-			for(int u=0;u<n;++u)
+			for (int u = 0; u<n; ++u)
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
 				{
 					cout << p->pdata->start() << " " << p->pdata->end() << " " << p->pdata->length() << endl;
 				}
 		}
+
+		int getEdges(EdgeInfo* edges, int ST)
+		{
+			int NN = 0;
+			for (int u = 0; u<n; ++u)
+				for (edge* p = Elast[u]; p != NULL; p = p->next)
+				{
+					if (p->pdata->length() < ST || p->pdata->end() <= u) continue;
+					edges[NN++] = *(p->pdata);
+				}
+			return NN;
+		}
 	};
-	
+
 }
 
 #endif // !SIGRAPH_H

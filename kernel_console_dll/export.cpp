@@ -128,7 +128,7 @@ extern "C" {
 	*/
 	DllExport void betweennessCentrality(Graph* pG, int* c)
 	{
-		return pG->betweennessCentrality(c);
+		return pG->betweennessCentralityImproved(c);
 	}
 
 	DllExport void connectivityInit(Graph* pG)

@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
+#include <thread>
 
 namespace SI
 {
