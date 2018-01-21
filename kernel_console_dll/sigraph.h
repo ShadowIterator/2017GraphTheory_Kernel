@@ -561,6 +561,18 @@ namespace SI
 					cout << p->pdata->start() << " " << p->pdata->end() << " " << p->pdata->length() << endl;
 				}
 		}
+
+		int getEdges(EdgeInfo* edges, int ST)
+		{
+			int NN = 0;
+			for (int u = 0; u<n; ++u)
+				for (edge* p = Elast[u]; p != NULL; p = p->next)
+				{
+					if (p->pdata->length() < ST) continue;
+					edges[NN++] = *(p->pdata);
+				}
+			return NN;
+		}
 	};
 
 }
