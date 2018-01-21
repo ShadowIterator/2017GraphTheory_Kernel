@@ -568,7 +568,7 @@ namespace SI
 			for (int u = 0; u<n; ++u)
 				for (edge* p = Elast[u]; p != NULL; p = p->next)
 				{
-					if (p->pdata->length() < ST) continue;
+					if (p->pdata->length() < ST || p->pdata->end() <= u) continue;
 					edges[NN++] = *(p->pdata);
 				}
 			return NN;
