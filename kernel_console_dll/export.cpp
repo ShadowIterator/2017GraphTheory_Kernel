@@ -62,6 +62,8 @@ extern "C" {
 		for (fin >> m; m; --m)
 		{
 			fin >> ei;
+			if (ei.length() < 2)
+				continue;
 			pG->addPath(ei);
 			ei.u ^= ei.v ^= ei.u ^= ei.v;
 			pG->addPath(ei);

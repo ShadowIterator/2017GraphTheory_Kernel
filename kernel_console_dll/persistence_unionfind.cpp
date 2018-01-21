@@ -55,15 +55,11 @@ namespace SI
 		if (rku >= rkv)
 		{
 			fath.modify(v, u);
-		//	if (!(rku^rkv))
-		//		size.modify(u, rku + 1);
-		//	else size.nopmodify();
 			size.modify(u, rku + rkv);
 		}
 		else
 		{
 			fath.modify(u, v);
-			//size.nopmodify();
 			size.modify(v, rku + rkv);
 		}
 		cnt.modify(0, cnt.at(cnt.sizeq() - 1, 0) - 1);

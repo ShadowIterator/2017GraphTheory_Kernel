@@ -49,7 +49,7 @@ namespace SI
 			while (n >> logn) ++logn;
 			root.resize(q);
 			root.clear();
-			_allocBuffer(q * logn + n);
+			_allocBuffer(2 * q * logn + n);
 		}
 		void clear()
 		{
@@ -90,25 +90,6 @@ namespace SI
 			if (NBuf > bufSize) return -1;
 			return NBuf;
 		}
-
-	/*	bool modify_dfs(int oi, int p, int k)
-		{
-			int i = newNode();
-			if (i == -1) return false;
-			buffer[i] = buffer[oi];
-			if (!k) return true;
-			if ((p >> k) & 1)
-			{
-				buffer[i].rs = NBuf + 1;
-				return modify_dfs(buffer[oi].rs, p, k - 1);
-			}
-			else
-			{
-				buffer[i].ls = NBuf + 1;
-				return modify_dfs(buffer[oi].ls, p, k - 1);
-			}
-		}*/
-
 		bool _modify(int oi, int p, int k, const T& tdata)
 		{
 			int i;
@@ -132,21 +113,6 @@ namespace SI
 			}
 			buffer[i].data = tdata;
 			return true;
-			/*int i = newNode();
-			if (i == -1) return false;
-			buffer[i] = buffer[oi];
-			if (!k) return true;
-			if ((p >> k) & 1)
-			{
-				buffer[i].rs = NBuf + 1;
-				return modify_dfs(buffer[oi].rs, p, k - 1);
-			}
-			else
-			{
-				buffer[i].ls = NBuf + 1;
-				return modify_dfs(buffer[oi].ls, p, k - 1);
-			}*/
-
 		}
 
 
@@ -155,7 +121,6 @@ namespace SI
 			int k = 0;
 			for (++p; p >> k; ++k);
 			root.push_back(std::make_pair(NBuf + 1, NBuf + k));
-			//modify_dfs(root[root.size() - 2], p, k - 1);
 			return _modify(root[root.size() - 2].first, p, k - 1, tdata);
 		}
 
