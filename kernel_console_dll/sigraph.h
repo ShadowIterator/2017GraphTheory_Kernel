@@ -333,7 +333,7 @@ namespace SI
 			return rtn;
 		}
 
-		bool KruskalStep(int stp, EdgeInfo* selEdge = NULL)
+		bool KruskalStep(int stp, EdgeInfo* selEdge, int ST)
 		{
 			static int totE;// = 0;
 			static int k;// = 0;
@@ -351,7 +351,7 @@ namespace SI
 				edges = new EdgeInfo*[m];
 				for (int u = 0; u < n; ++u)
 					for (edge*p = Elast[u]; p != NULL; p = p->next)
-						edges[totE++] = p->pdata;
+						if (p->pdata->length() >= ST) edges[totE++] = p->pdata;
 				std::sort(edges, edges + totE, cmp_EdgeInfoStar_w_smaller);
 			}
 

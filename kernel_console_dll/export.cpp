@@ -117,9 +117,9 @@ extern "C" {
 	@retval true success
 	@retval false failed
 	*/
-	DllExport bool kruskalStep(Graph* pG, int stp, EdgeInfo* pE)
+	DllExport bool kruskalStep(Graph* pG, int stp, EdgeInfo* pE, int ST)
 	{
-		return pG->KruskalStep(stp, pE);
+		return pG->KruskalStep(stp, pE,ST);
 	}
 	
 	/**
